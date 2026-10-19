@@ -8,7 +8,13 @@ on:
 
 jobs:
   playwright-tests:
+    name: Tests - ${{ matrix.browser }}
     runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        browser: [chromium, firefox]
 
     steps:
       - name: Checkout repository
@@ -22,19 +28,19 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python -m pip install -r requirements.txt
 
-      - name: Install Playwright Chromium
-        run: python -m playwright install --with-deps chromium
+      - name: Install Playwright browser
+        run: python -m playwright install --with-deps ${{ matrix.browser }}
 
       - name: Run tests
         run: |
-          python -m pytest tests/ -v --browser chromium --alluredir=allure-results
+          python -m pytest tests/ -v --browser ${{ matrix.browser }} --alluredir=allure-results
 
       - name: Upload Allure results
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
+          name: allure-results-${{ matrix.browser }}
           path: allure-results/
           if-no-files-found: ignore
