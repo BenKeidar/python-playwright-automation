@@ -46,6 +46,7 @@ jobs:
           if-no-files-found: ignore
 
 
+
   allure-report:
     name: Generate Allure Report
     needs: playwright-tests
@@ -60,11 +61,26 @@ jobs:
           path: allure-results
           merge-multiple: true
 
-      - name: Generate Allure HTML report
-        uses: simple-elf/allure-report-action@v1.7
+      - name: Set up Java
+        uses: actions/setup-java@v4
         with:
-          allure_results: allure-results
-          allure_report: allure-report
+          distribution: temurin
+          java-version: '17'
+
+      - name: Install Allure CLI
+        run: |
+          curl -fsSL -o allure.tgz \
+            https://github.com/allure-framework/allure2/releases/download/2.34.1/allure-2.34.1.tgz
+
+          tar -xzf allure.tgz
+
+          echo "$GITHUB_WORKSPACE/allure-2.34.1/bin" >> "$GITHUB_PATH"
+
+      - name: Generate Allure HTML report
+        run: |
+          allure generate allure-results \
+            --clean \
+            -o allure-report
 
       - name: Upload Allure HTML report
         if: always()
