@@ -1,5 +1,7 @@
-
 from playwright.sync_api import Page
+
+from data.sort_options import SortOption
+from pages.cart_page import CartPage
 
 
 class InventoryPage:
@@ -14,6 +16,17 @@ class InventoryPage:
 
         self.cart_badge = page.locator(
             "[data-test='shopping-cart-badge']"
+        )
+        self.sort_dropdown = page.locator(
+            "[data-test='product-sort-container']"
+        )
+
+        self.product_prices = page.locator(
+            "[data-test='inventory-item-price']"
+        )
+
+        self.product_names = page.locator(
+            "[data-test='inventory-item-name']"
         )
 
     def products_title(self):
@@ -40,3 +53,24 @@ class InventoryPage:
 
     def cart_item_count(self):
         return self.cart_badge
+
+    def remove_product_from_cart(self, product_name: str):
+        self.remove_button(product_name).click()
+
+    def open_cart(self) -> CartPage:
+        self.page.locator("[data-test='shopping-cart-link']").click()
+        return CartPage(self.page)
+
+    def sort_products(self, sort_option: SortOption):
+        self.sort_dropdown.select_option(sort_option.value)
+
+    def get_product_prices(self) -> list[float]:
+        prices_text = self.product_prices.all_text_contents()
+
+        return [
+            float(price.replace("$", ""))
+            for price in prices_text
+        ]
+
+    def get_product_names(self) -> list[str]:
+        return self.product_names.all_text_contents()
