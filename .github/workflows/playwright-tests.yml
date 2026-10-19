@@ -76,6 +76,14 @@ jobs:
 
           echo "$GITHUB_WORKSPACE/allure-2.34.1/bin" >> "$GITHUB_PATH"
 
+      - name: Add Allure environment information
+        run: |
+          echo "Environment=GitHub Actions" > allure-results/environment.properties
+          echo "Operating.System=Ubuntu Linux" >> allure-results/environment.properties
+          echo "Python.Version=3.13" >> allure-results/environment.properties
+          echo "Browsers=Chromium, Firefox" >> allure-results/environment.properties
+          echo "Test.Framework=Pytest + Playwright" >> allure-results/environment.properties
+
       - name: Generate Allure HTML report
         run: |
           allure generate allure-results \
