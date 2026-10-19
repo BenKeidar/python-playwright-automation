@@ -44,3 +44,32 @@ jobs:
           name: allure-results-${{ matrix.browser }}
           path: allure-results/
           if-no-files-found: ignore
+
+
+  allure-report:
+    name: Generate Allure Report
+    needs: playwright-tests
+    if: always()
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Allure results
+        uses: actions/download-artifact@v4
+        with:
+          pattern: allure-results-*
+          path: allure-results
+          merge-multiple: true
+
+      - name: Generate Allure HTML report
+        uses: simple-elf/allure-report-action@v1.7
+        with:
+          allure_results: allure-results
+          allure_report: allure-report
+
+      - name: Upload Allure HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: allure-html-report
+          path: allure-report/
+          if-no-files-found: warn
