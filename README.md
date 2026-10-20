@@ -1,33 +1,80 @@
 # Python Playwright Automation Framework
 
-A UI test automation framework built with **Python, Playwright, and Pytest**, following the **Page Object Model (POM)** design pattern.
+A comprehensive UI test automation framework built with **Python, Playwright, and Pytest**, demonstrating modern test automation practices, reusable architecture, cross-browser testing, visual regression testing, reporting, and continuous integration.
 
-The project automates end-to-end testing of [SauceDemo](https://www.saucedemo.com/), covering authentication, product inventory, shopping cart functionality, and checkout workflows.
-
-The framework includes reusable fixtures, data-driven testing, Allure reporting, and a GitHub Actions CI pipeline with cross-browser execution.
+The framework automates end-to-end testing of the [SauceDemo](https://www.saucedemo.com/) e-commerce application.
 
 ## Tech Stack
 
-- **Python 3.13** — Programming language
-- **Playwright** — Browser automation
-- **Pytest** — Test execution and fixtures
-- **Allure** — Test reporting and failure screenshots
-- **GitHub Actions** — Continuous Integration
-- **Chromium & Firefox** — Cross-browser testing
+| Technology | Purpose |
+|---|---|
+| Python 3.13 | Programming language |
+| Playwright | Browser automation |
+| Pytest | Test execution and fixtures |
+| Pillow | Screenshot comparison for visual regression |
+| Allure | Test reporting and failure attachments |
+| GitHub Actions | Continuous integration |
+| Git / GitHub | Version control |
+
+## Key Features
+
+- **Page Object Model (POM)** for maintainable and reusable page interactions.
+- **Pytest Fixtures** for test setup, login flows, and reusable test state.
+- **Data-Driven Testing** using `pytest.mark.parametrize`.
+- **Cross-Browser Testing** with Chromium and Firefox.
+- **Visual Regression Testing** with baseline screenshot comparison.
+- **Screenshot on Failure** automatically attached to Allure reports.
+- **Centralized Test Data** for credentials, products, and checkout information.
+- **Enum-Based Sorting Options** for readable product sorting tests.
+- **Allure Reporting** with test results, environment information, and CI execution details.
+- **GitHub Actions CI/CD** with automated functional and visual test execution.
 
 ## Test Coverage
 
-The framework currently includes **28 automated test cases**, covering:
+The framework contains **31 unique test cases**, executed across multiple environments.
 
-| Module | Test Scenarios |
+### Functional Tests — 28 Cases
+
+**Login Tests**
+- Successful login with valid credentials.
+- Invalid username and password combinations.
+- Locked-out user validation.
+- Required-field validation.
+
+**Inventory and Cart Tests**
+- Adding individual products to the cart.
+- Adding multiple products.
+- Removing products.
+- Verifying cart contents.
+- Validating empty-cart behavior.
+- Product sorting by name and price.
+
+**Checkout Tests**
+- Checkout navigation.
+- Customer information entry.
+- Required-field validation.
+- Complete end-to-end purchase flow.
+
+**Homepage Tests**
+- Homepage title verification.
+
+### Visual Regression Tests — 3 Cases
+
+| Page | Validation |
 |---|---|
-| Homepage | Browser title verification |
-| Login | Valid credentials, invalid credentials, locked-out users, required field validation |
-| Inventory | Product selection, sorting by price and name, cart badge validation |
-| Shopping Cart | Adding and removing products, empty cart validation |
-| Checkout | Checkout navigation, customer information validation, successful order completion |
+| Login | Compare the login page against a baseline screenshot |
+| Inventory | Compare the product listing page against a baseline screenshot |
+| Cart | Compare the shopping cart against a baseline screenshot |
 
-Parameterized tests are used to cover multiple scenarios without duplicating test logic.
+Visual tests use Playwright screenshots and Pillow to detect pixel-level differences.
+
+When a difference is detected, the framework saves and attaches the following images to Allure:
+
+1. **Visual Baseline** — the expected screenshot.
+2. **Actual Screenshot** — the screenshot from the current test run.
+3. **Visual Difference** — the pixels that differ between the images.
+
+The framework also captures an additional screenshot automatically when a test fails.
 
 ## Project Structure
 
@@ -36,10 +83,12 @@ python-playwright-automation/
 ├── .github/
 │   └── workflows/
 │       └── playwright-tests.yml
+│
 ├── data/
 │   ├── __init__.py
-│   ├── sort_options.py
-│   └── test_data.py
+│   ├── test_data.py
+│   └── sort_options.py
+│
 ├── pages/
 │   ├── __init__.py
 │   ├── login_page.py
@@ -48,39 +97,37 @@ python-playwright-automation/
 │   ├── checkout_page.py
 │   ├── checkout_overview_page.py
 │   └── checkout_complete_page.py
+│
 ├── tests/
 │   ├── test_homepage.py
 │   ├── test_login.py
-│   └── test_inventory.py
+│   ├── test_inventory.py
+│   └── test_visual.py
+│
+├── utils/
+│   ├── __init__.py
+│   └── visual_comparison.py
+│
+├── visual_baselines/
+│   ├── login_page.png
+│   ├── inventory_page.png
+│   └── cart_page.png
+│
 ├── conftest.py
+├── pytest.ini
 ├── requirements.txt
 ├── .gitignore
 └── README.md
 ```
 
-## Framework Design
+## Getting Started
 
-### Page Object Model
+### Prerequisites
 
-Each application page is represented by a dedicated Python class.
-
-Page Objects encapsulate locators and page interactions, keeping test cases readable and maintainable.
-
-### Pytest Fixtures
-
-Reusable fixtures handle browser setup and common test prerequisites, including authenticated sessions.
-
-### Data-Driven Testing
-
-Pytest parameterization is used to execute multiple test scenarios with different inputs.
-
-Enums and centralized test data improve consistency and maintainability.
-
-### Failure Reporting
-
-Allure integrates with Pytest to provide execution steps, test results, and screenshots captured automatically when tests fail.
-
-## Installation
+- Python 3.13
+- Git
+- Chromium and Firefox (installed through Playwright)
+- Allure CLI (optional, for viewing local reports)
 
 ### 1. Clone the Repository
 
@@ -91,119 +138,177 @@ cd python-playwright-automation
 
 ### 2. Create a Virtual Environment
 
-```bash
-python -m venv .venv
-```
-
-Activate it on Windows PowerShell:
+**Windows PowerShell:**
 
 ```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-On macOS/Linux:
-
-```bash
-source .venv/bin/activate
+py -3.13 -m venv .venv
 ```
 
 ### 3. Install Dependencies
 
-```bash
-python -m pip install -r requirements.txt
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
 ```
 
 ### 4. Install Playwright Browsers
 
-```bash
-python -m playwright install chromium firefox
+```powershell
+.\.venv\Scripts\python.exe -m playwright install chromium firefox
 ```
 
 ## Running Tests
 
-Run the complete test suite:
+All commands below are intended to run from the project root directory using Windows PowerShell.
 
-```bash
-python -m pytest tests/ -v
+### Run All Tests with Chromium
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -v --browser chromium
 ```
 
-Run tests in Chromium:
+### Run Functional Tests Only
 
-```bash
-python -m pytest tests/ -v --browser chromium
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -v -m "not visual" --browser chromium
 ```
 
-Run tests in Firefox:
+### Run Visual Regression Tests Only
 
-```bash
-python -m pytest tests/ -v --browser firefox
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -v -m visual --browser chromium
 ```
 
-Run a specific test module:
+### Run Tests with Firefox
 
-```bash
-python -m pytest tests/test_login.py -v
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -v -m "not visual" --browser firefox
 ```
+
+### Run a Specific Test File
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/test_login.py -v --browser chromium
+```
+
+## Visual Regression Architecture
+
+Visual regression tests use a shared screenshot comparison utility located at:
+
+`utils/visual_comparison.py`
+
+The comparison process follows these steps:
+
+1. Navigate to the page and verify the expected UI is visible.
+2. Wait for relevant page content and images to load.
+3. Capture an actual screenshot using a consistent viewport.
+4. Load the corresponding baseline screenshot.
+5. Compare image dimensions and pixel values.
+6. Fail the test if a visual difference is detected.
+7. Attach the baseline, actual, and difference images to Allure.
+
+Example usage:
+
+```python
+compare_screenshots(page, "login_page")
+```
+
+Baseline images are stored in `visual_baselines/`.
+
+Generated screenshots and difference images are stored in `test-results/`.
+
+### Visual Testing Considerations
+
+Visual regression tests are sensitive to browser rendering, operating systems, fonts, image loading, and viewport settings.
+
+The committed baseline images were created using **Windows and Chromium**.
+
+The GitHub Actions workflow therefore runs visual regression tests separately on Windows with Chromium, while functional tests run on Ubuntu with Chromium and Firefox.
+
+Baseline images should only be updated after reviewing and approving an intentional UI change.
 
 ## Allure Reporting
 
-Generate Allure results:
+The framework integrates **Allure** to provide detailed test execution reports.
 
-```bash
-python -m pytest tests/ -v --alluredir=allure-results --clean-alluredir
+### Generate Test Results
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests/ -v --browser chromium --alluredir=allure-results --clean-alluredir
 ```
 
-View the report locally (requires Allure CLI):
+### Open the Allure Report
 
-```bash
+After installing the Allure CLI:
+
+```powershell
 allure serve allure-results
 ```
 
-The framework automatically attaches screenshots to Allure results when a test fails during execution.
+Allure reports include:
 
-## Continuous Integration
+- Test execution status and duration.
+- Test suites and parameterized test cases.
+- Screenshots captured on failure.
+- Baseline, actual, and difference screenshots for visual failures.
+- CI environment information.
+- GitHub Actions executor details and links.
 
-GitHub Actions automatically executes the test suite on:
+## GitHub Actions CI/CD
 
-- Push events
-- Pull requests
-- Manual workflow triggers
+The project includes an automated GitHub Actions workflow:
 
-The CI pipeline uses a **matrix strategy** to run the test suite independently on Chromium and Firefox.
+`.github/workflows/playwright-tests.yml`
 
-Each browser executes all 28 tests, resulting in **56 test executions per complete CI run**.
+The workflow runs automatically on:
 
-After execution, the pipeline:
+- Push events.
+- Pull requests.
+- Manual execution using `workflow_dispatch`.
 
-1. Uploads Allure results for each browser.
-2. Combines the results into a single report.
-3. Generates an Allure HTML report.
-4. Includes environment information and a link to the GitHub Actions execution.
-5. Uploads the HTML report as a downloadable artifact.
+### CI Test Matrix
+
+| Job | Operating System | Browser | Tests |
+|---|---|---|---:|
+| Functional Tests | Ubuntu Linux | Chromium | 28 |
+| Functional Tests | Ubuntu Linux | Firefox | 28 |
+| Visual Regression Tests | Windows | Chromium | 3 |
+| **Total** | | | **59** |
+
+### CI Workflow
+
+1. Check out the repository.
+2. Set up Python 3.13.
+3. Install project dependencies.
+4. Install the required Playwright browsers.
+5. Execute functional and visual test jobs.
+6. Upload Allure result artifacts.
+7. Merge results from all test jobs.
+8. Generate a combined Allure HTML report.
+9. Upload the final report as a downloadable artifact.
+
+The workflow also uploads visual test output files when the visual job fails.
 
 ### CI Results
 
-**Latest verified execution: 56/56 tests passed across Chromium and Firefox.**
+**Latest verified project milestone: 59/59 successful test executions**, including all three visual regression tests.
 
-Reports are available as downloadable artifacts from the GitHub Actions workflow runs.
+Allure reports are available as downloadable artifacts from GitHub Actions workflow runs.
 
-## Key Automation Practices
+## Design Principles
 
-- Page Object Model for separation of concerns
-- Reusable fixtures for test setup
-- Parameterized tests for data-driven coverage
-- Centralized test data and enums
-- Playwright auto-waiting assertions
-- Allure steps and failure screenshots
-- Cross-browser testing
-- Automated CI execution and reporting
+The framework follows several software engineering and test automation principles:
 
-## Application Under Test
-
-[**SauceDemo**](https://www.saucedemo.com/) — A sample e-commerce application used for UI automation practice.
+- **Separation of Concerns:** Tests describe scenarios while Page Objects handle UI interactions.
+- **DRY (Don't Repeat Yourself):** Shared fixtures and utilities minimize duplicated logic.
+- **Maintainability:** UI locators and reusable actions are centralized.
+- **Readability:** Test methods use descriptive names and business-oriented operations.
+- **Reusability:** Common workflows can be shared across multiple test cases.
+- **CI Readiness:** Automated execution and reporting are integrated into the development workflow.
 
 ## Author
 
-**BenKeidar**
+**Ben Keidar**
+
+QA Automation Engineer
 
 [GitHub Profile](https://github.com/BenKeidar)
